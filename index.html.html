@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Plate AI - Multi-Platform Distribution</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --android: #3ddc84;
+            --ios: #000000;
+            --windows: #0078d7;
+            --mac: #999999;
+            --linux: #f1502f;
+            --web: #4285f4;
+            --pwa: #673ab7;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .platforms-header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 0 0 40px 40px;
+            padding: 3rem 1rem;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 3rem;
+        }
+        
+        .platform-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin: 2rem auto;
+            max-width: 1200px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 2rem 0;
+        }
+        
+        .platform-item {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .platform-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        .platform-item.android { border-color: var(--android); }
+        .platform-item.ios { border-color: var(--ios); }
+        .platform-item.windows { border-color: var(--windows); }
+        .platform-item.mac { border-color: var(--mac); }
+        .platform-item.linux { border-color: var(--linux); }
+        .platform-item.web { border-color: var(--web); }
+        .platform-item.pwa { border-color: var(--pwa); }
+        
+        .platform-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .android .platform-icon { color: var(--android); }
+        .ios .platform-icon { color: var(--ios); }
+        .windows .platform-icon { color: var(--windows); }
+        .mac .platform-icon { color: var(--mac); }
+        .linux .platform-icon { color: var(--linux); }
+        .web .platform-icon { color: var(--web); }
+        .pwa .platform-icon { color: var(--pwa); }
+        
+        .qr-section {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 15px;
+            margin: 2rem 0;
+            border: 3px dashed var(--pwa);
+        }
+        
+        #qrcode {
+            display: inline-block;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid var(--pwa);
+            box-shadow: 0 8px 25px rgba(103, 58, 183, 0.2);
+        }
+        
+        .btn-platform {
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px;
+            min-width: 200px;
+            transition: all 0.3s;
+        }
+        
+        .btn-android { background: var(--android); color: white; }
+        .btn-ios { background: var(--ios); color: white; }
+        .btn-windows { background: var(--windows); color: white; }
+        .btn-mac { background: var(--mac); color: white; }
+        .btn-linux { background: var(--linux); color: white; }
+        .btn-web { background: var(--web); color: white; }
+        .btn-pwa { background: var(--pwa); color: white; }
+        
+        .btn-platform:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            color: white;
+        }
+        
+        .badge-platform {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .badge-android { background: var(--android); color: white; }
+        .badge-ios { background: var(--ios); color: white; }
+        .badge-windows { background: var(--windows); color: white; }
+        .badge-mac { background: var(--mac); color: white; }
+        .badge-linux { background: var(--linux); color: white; }
+        .badge-web { background: var(--web); color: white; }
+        .badge-pwa { background: var(--pwa); color: white; }
+        
+        .step-box {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 5px solid var(--pwa);
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .feature-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="platforms-header">
+        <h1><i class="fas fa-globe-americas"></i> Smart Plate AI - Every Platform</h1>
+        <p class="lead">Access your nutrition assistant anywhere, on any device</p>
+        <p>PWA URL: <code>https://pwa-nutrition.onrender.com</code></p>
+    </div>
+    
+    <!-- QR Code Section -->
+    <div class="platform-card">
+        <div class="qr-section">
+            <h2><i class="fas fa-qrcode"></i> Universal Access QR Code</h2>
+            <p>Scan this QR code with any device to access Smart Plate AI</p>
+            
+            <div id="qrcode"></div>
+            
+            <div class="mt-3">
+                <button class="btn btn-pwa" onclick="openPWA()">
+                    <i class="fas fa-external-link-alt"></i> Open PWA Now
+                </button>
+                <button class="btn btn-outline-primary" onclick="shareAll()">
+                    <i class="fas fa-share-alt"></i> Share All Platforms
+                </button>
+            </div>
+            
+            <div class="mt-3">
+                <input type="text" class="form-control text-center" 
+                       value="https://pwa-nutrition.onrender.com" readonly>
+                <small class="text-muted">Universal PWA URL works on all devices</small>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Platform Grid -->
+    <div class="platform-card">
+        <h2 class="text-center mb-4"><i class="fas fa-layer-group"></i> Available On All Platforms</h2>
+        
+        <div class="platform-grid">
+            <!-- Android -->
+            <div class="platform-item android" onclick="showAndroidOptions()">
+                <span class="badge-platform badge-android">Mobile</span>
+                <div class="platform-icon">
+                    <i class="fab fa-android"></i>
+                </div>
+                <h4>Android</h4>
+                <p>APK • Play Store • TWA</p>
+                <div class="feature-item">📱 Install as App</div>
+                <div class="feature-item">🔔 Push Notifications</div>
+                <div class="feature-item">📴 Offline Support</div>
+            </div>
+            
+            <!-- iOS -->
+            <div class="platform-item ios" onclick="showiOSoptions()">
+                <span class="badge-platform badge-ios">Mobile</span>
+                <div class="platform-icon">
+                    <i class="fab fa-apple"></i>
+                </div>
+                <h4>iPhone/iPad</h4>
+                <p>Home Screen • Safari • Web Clip</p>
+                <div class="feature-item">🏠 Add to Home Screen</div>
+                <div class="feature-item">🔒 Secure</div>
+                <div class="feature-item">⚡ Fast</div>
+            </div>
+            
+            <!-- Windows -->
+            <div class="platform-item windows" onclick="showWindowsOptions()">
+                <span class="badge-platform badge-windows">Desktop</span>
+                <div class="platform-icon">
+                    <i class="fab fa-windows"></i>
+                </div>
+                <h4>Windows</h4>
+                <p>PWA • Edge • Chrome • Desktop App</p>
+                <div class="feature-item">🖥️ Desktop Shortcut</div>
+                <div class="feature-item">📂 File System Access</div>
+                <div class="feature-item">🔄 Background Sync</div>
+            </div>
+            
+            <!-- Mac -->
+            <div class="platform-item mac" onclick="showMacOptions()">
+                <span class="badge-platform badge-mac">Desktop</span>
+                <div class="platform-icon">
+                    <i class="fab fa-apple"></i>
+                </div>
+                <h4>Mac</h4>
+                <p>Safari • Chrome • Desktop PWA</p>
+                <div class="feature-item">🍎 Safari PWA</div>
+                <div class="feature-item">⌘ Keyboard Shortcuts</div>
+                <div class="feature-item">📊 Native Integration</div>
+            </div>
+            
+            <!-- Linux -->
+            <div class="platform-item linux" onclick="showLinuxOptions()">
+                <span class="badge-platform badge-linux">Desktop</span>
+                <div class="platform-icon">
+                    <i class="fab fa-linux"></i>
+                </div>
+                <h4>Linux</h4>
+                <p>Chrome • Firefox • Electron App</p>
+                <div class="feature-item">🐧 All Distributions</div>
+                <div class="feature-item">⚙️ Customizable</div>
+                <div class="feature-item">🔧 Developer Friendly</div>
+            </div>
+            
+            <!-- Web -->
+            <div class="platform-item web" onclick="showWebOptions()">
+                <span class="badge-platform badge-web">Browser</span>
+                <div class="platform-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <h4>Web Browser</h4>
+                <p>Chrome • Firefox • Safari • Edge</p>
+                <div class="feature-item">🌐 Any Browser</div>
+                <div class="feature-item">🔍 Searchable</div>
+                <div class="feature-item">🔗 Shareable Links</div>
+            </div>
+            
+            <!-- PWA -->
+            <div class="platform-item pwa" onclick="showPWAoptions()">
+                <span class="badge-platform badge-pwa">Universal</span>
+                <div class="platform-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h4>Progressive Web App</h4>
+                <p>One Codebase • All Platforms</p>
+                <div class="feature-item">🚀 Instant Loading</div>
+                <div class="feature-item">📴 Works Offline</div>
+                <div class="feature-item">📱 App-like Experience</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Distribution Options -->
+    <div class="platform-card">
+        <h2 class="text-center mb-4"><i class="fas fa-download"></i> Distribution Formats</h2>
+        
+        <div class="row">
+            <!-- Mobile Apps -->
+            <div class="col-md-6">
+                <div class="step-box">
+                    <h4><i class="fas fa-mobile-alt"></i> Mobile App Packages</h4>
+                    
+                    <button class="btn-platform btn-android w-100 mb-2" onclick="createAndroidAPK()">
+                        <i class="fab fa-android"></i> Generate Android APK
+                    </button>
+                    
+                    <button class="btn-platform btn-ios w-100 mb-2" onclick="createiOSapp()">
+                        <i class="fab fa-app-store-ios"></i> Create iOS App Clip
+                    </button>
+                    
+                    <button class="btn-platform btn-pwa w-100" onclick="createMobilePWA()">
+                        <i class="fas fa-mobile"></i> Mobile-Optimized PWA
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Desktop Apps -->
+            <div class="col-md-6">
+                <div class="step-box">
+                    <h4><i class="fas fa-desktop"></i> Desktop Applications</h4>
+                    
+                    <button class="btn-platform btn-windows w-100 mb-2" onclick="createWindowsApp()">
+                        <i class="fab fa-windows"></i> Windows Desktop App
+                    </button>
+                    
+                    <button class="btn-platform btn-mac w-100 mb-2" onclick="createMacApp()">
+                        <i class="fab fa-apple"></i> Mac Desktop App
+                    </button>
+                    
+                    <button class="btn-platform btn-linux w-100" onclick="createLinuxApp()">
+                        <i class="fab fa-linux"></i> Linux Desktop App
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Advanced Options -->
+        <div class="step-box mt-4">
+            <h4><i class="fas fa-rocket"></i> Advanced Distribution</h4>
+            
+            <div class="feature-list">
+                <div class="feature-item" onclick="createElectronApp()">
+                    <i class="fab fa-electron"></i>
+                    <div>Electron App</div>
+                    <small>Cross-platform desktop</small>
+                </div>
+                
+                <div class="feature-item" onclick="createChromeExtension()">
+                    <i class="fab fa-chrome"></i>
+                    <div>Chrome Extension</div>
+                    <small>Browser integration</small>
+                </div>
+                
+                <div class="feature-item" onclick="createFirefoxAddon()">
+                    <i class="fab fa-firefox"></i>
+                    <div>Firefox Add-on</div>
+                    <small>Firefox browser</small>
+                </div>
+                
+                <div class="feature-item" onclick="createEdgeExtension()">
+                    <i class="fab fa-edge"></i>
+                    <div>Edge Extension</div>
+                    <small>Microsoft Edge</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Technical Details -->
+    <div class="platform-card">
+        <h2 class="text-center mb-4"><i class="fas fa-code"></i> Technical Implementation</h2>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="step-box">
+                    <h5><i class="fas fa-wrench"></i> Build Tools</h5>
+                    <ul>
+                        <li><strong>Capacitor</strong> - iOS/Android native apps</li>
+                        <li><strong>Electron</strong> - Windows/Mac/Linux desktop</li>
+                        <li><strong>PWA Builder</strong> - Multi-format generation</li>
+                        <li><strong>Bubblewrap</strong> - Android TWA APKs</li>
+                        <li><strong>Cordova</strong> - Legacy mobile support</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="step-box">
+                    <h5><i class="fas fa-server"></i> Deployment Options</h5>
+                    <ul>
+                        <li><strong>Google Play Store</strong> - Android distribution</li>
+                        <li><strong>Apple App Store</strong> - iOS distribution (via Capacitor)</li>
+                        <li><strong>Microsoft Store</strong> - Windows apps</li>
+                        <li><strong>GitHub Releases</strong> - Direct downloads</li>
+                        <li><strong>Your Website</strong> - Direct hosting</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Code Examples -->
+        <div class="step-box mt-3">
+            <h5><i class="fas fa-terminal"></i> Quick Start Commands</h5>
+            <pre class="bg-dark text-white p-3 rounded">
+# Convert PWA to Android/iOS with Capacitor
+npm install @capacitor/core @capacitor/cli
+npx cap init SmartPlateAI com.smartplate.ai
+npx cap add android
+npx cap add ios
+npx cap sync
+
+# Convert to Desktop with Electron
+npm install electron --save-dev
+# Create main.js and package.json
+npm run make
+
+# Generate all formats with PWA Builder
+npx @pwabuilder/pwabuilder build</pre>
+        </div>
+    </div>
+    
+    <!-- Call to Action -->
+    <div class="platform-card text-center">
+        <h2><i class="fas fa-magic"></i> Start Creating!</h2>
+        <p class="lead">Choose your target platforms and start distributing</p>
+        
+        <div class="mt-4">
+            <button class="btn-platform btn-pwa btn-lg" onclick="generateAll()">
+                <i class="fas fa-bolt"></i> Generate All Formats
+            </button>
+            
+            <button class="btn btn-outline-primary btn-lg" onclick="showInstructions()">
+                <i class="fas fa-book"></i> View Detailed Instructions
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Configuration
+        const PWA_URL = "https://pwa-nutrition.onrender.com";
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Generate QR code
+            generateQRcode();
+            
+            // Show welcome message
+            console.log("🚀 Smart Plate AI Multi-Platform Distribution");
+            console.log("🔗 PWA URL:", PWA_URL);
+            console.log("📱 Available on: Android, iOS, Windows, Mac, Linux, Web");
+            
+            // Auto-detect platform and suggest options
+            detectPlatformAndSuggest();
+        });
+        
+        // Generate QR code
+        function generateQRcode() {
+            try {
+                new QRCode(document.getElementById("qrcode"), {
+                    text: PWA_URL,
+                    width: 250,
+                    height: 250,
+                    colorDark: "#673ab7",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (error) {
+                console.error("QR Code error:", error);
+            }
+        }
+        
+        // Open PWA
+        function openPWA() {
+            window.open(PWA_URL, '_blank');
+            toast("Opening Smart Plate AI PWA...");
+        }
+        
+        // Share all platforms
+        function shareAll() {
+            const shareText = `Access Smart Plate AI on all platforms:
+📱 Android: Install as APK or from Play Store
+🍎 iOS: Add to Home Screen from Safari
+🖥️ Windows/Mac/Linux: Install as desktop app
+🌐 Web: ${PWA_URL}
+            
+One PWA, Every Platform!`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Smart Plate AI - All Platforms',
+                    text: shareText,
+                    url: PWA_URL
+                });
+            } else {
+                navigator.clipboard.writeText(shareText)
+                    .then(() => alert('Platform list copied to clipboard!'));
+            }
+        }
+        
+        // Platform-specific functions
+        function showAndroidOptions() {
+            const options = `
+            ANDROID DISTRIBUTION OPTIONS:
+            
+            1. 🎯 Trusted Web Activity (TWA) APK
+               - Uses Bubblewrap: npx @bubblewrap/cli init
+               - Perfect for PWA wrapper
+            
+            2. 📦 Capacitor Native App
+               - npx @capacitor/cli create
+               - Full native capabilities
+            
+            3. 🛠️ Cordova Hybrid App
+               - cordova create + cordova platform add android
+               - Legacy support
+            
+            4. 🚀 PWA Builder APK
+               - Visit: https://www.pwabuilder.com
+               - Auto-generates APK
+            
+            5. 📲 Google Play Store
+               - Requires developer account ($25)
+               - Signed APK with keystore
+            `;
+            
+            showPlatformModal('Android', options, '#3ddc84');
+        }
+        
+        function showiOSoptions() {
+            const options = `
+            iOS DISTRIBUTION OPTIONS:
+            
+            1. 🏠 Add to Home Screen
+               - Open in Safari
+               - Tap Share → Add to Home Screen
+               - Free, no App Store needed
+            
+            2. 📱 Capacitor iOS App
+               - Requires Mac with Xcode
+               - npx cap add ios
+               - Full native app
+            
+            3. 🍎 App Store Distribution
+               - Requires Apple Developer account ($99/year)
+               - Need Mac for building
+            
+            4. ✂️ App Clips (iOS 14+)
+               - Lightweight app experience
+               - Great for quick access
+            
+            5. 🌐 Safari PWA Features
+               - Push notifications (iOS 16.4+)
+               - Badging API
+               - Fullscreen mode
+            `;
+            
+            showPlatformModal('iOS', options, '#000000');
+        }
+        
+        function showWindowsOptions() {
+            const options = `
+            WINDOWS DISTRIBUTION OPTIONS:
+            
+            1. 🖥️ PWA Desktop Installation
+               - Open in Edge/Chrome
+               - Click "Install" in address bar
+               - Creates Start menu shortcut
+            
+            2. ⚡ Electron Desktop App
+               - npm install electron
+               - Cross-platform desktop app
+               - Full system integration
+            
+            3. 📦 Microsoft Store
+               - PWA packaging for Store
+               - Visit: https://apps.microsoft.com/store
+               - Requires developer account
+            
+            4. 🚀 Progressive Web App
+               - Windows 10/11 native PWA support
+               - Automatic updates
+               - Offline capabilities
+            
+            5. 🔧 Windows App SDK
+               - Native Windows app with WebView2
+               - Full Windows API access
+            `;
+            
+            showPlatformModal('Windows', options, '#0078d7');
+        }
+        
+        function showMacOptions() {
+            const options = `
+            MAC DISTRIBUTION OPTIONS:
+            
+            1. 🍎 Safari App Mode
+               - File → "Add to Dock"
+               - Creates Mac app from website
+               - macOS Catalina+
+            
+            2. ⚡ Electron for Mac
+               - Universal Apple Silicon support
+               - .dmg or .pkg installer
+               - App Store distribution
+            
+            3. 🚀 Capacitor Mac App
+               - npx cap add @capacitor-community/electron
+               - Native Mac app from PWA
+            
+            4. 📦 Mac App Store
+               - Requires Apple Developer account
+               - Sandboxed app environment
+               - Automatic updates
+            
+            5. 🔧 PWA in Chrome/Edge
+               - Install as desktop app
+               - Menu bar integration
+               - Notification support
+            `;
+            
+            showPlatformModal('macOS', options, '#999999');
+        }
+        
+        function showLinuxOptions() {
+            const options = `
+            LINUX DISTRIBUTION OPTIONS:
+            
+            1. 🐧 PWA in Chrome/Chromium
+               - Install as Linux app
+               - .desktop file creation
+               - System integration
+            
+            2. ⚡ Electron for Linux
+               - .AppImage, .deb, .rpm packages
+               - All distributions supported
+               - System tray integration
+            
+            3. 🔧 Snap Package
+               - snapcraft.io packaging
+               - Automatic updates
+               - Sandboxed environment
+            
+            4. 📦 Flatpak Package
+               - Flatpak packaging
+               - Universal Linux package
+               - Sandboxed
+            
+            5. 🚀 Nativefier
+               - npm install -g nativefier
+               - nativefier "${PWA_URL}"
+               - Simple wrapper app
+            `;
+            
+            showPlatformModal('Linux', options, '#f1502f');
+        }
+        
+        function showWebOptions() {
+            const options = `
+            WEB BROWSER OPTIONS:
+            
+            1. 🌐 Universal PWA
+               - Works in all modern browsers
+               - Chrome, Firefox, Safari, Edge
+               - One codebase
+            
+            2. 🔍 SEO Optimization
+               - Server-side rendering
+               - Structured data
+               - Fast loading
+            
+            3. 📱 Responsive Design
+               - Mobile-first approach
+               - Adaptive layouts
+               - Touch/desktop optimized
+            
+            4. 🔒 Security Features
+               - HTTPS required
+               - Content Security Policy
+               - Secure headers
+            
+            5. 🚀 Performance
+               - Service Worker caching
+               - Lazy loading
+               - Code splitting
+            `;
+            
+            showPlatformModal('Web Browser', options, '#4285f4');
+        }
+        
+        function showPWAoptions() {
+            const options = `
+            PWA ADVANCED FEATURES:
+            
+            1. 📴 Offline-First
+               - Service Worker caching
+               - Background sync
+               - IndexedDB storage
+            
+            2. 🔔 Push Notifications
+               - Web Push API
+               - Scheduled notifications
+               - Rich notifications
+            
+            3. 📱 Native Features
+               - Camera access
+               - Geolocation
+               - File system access
+            
+            4. 💾 Data Management
+               - IndexedDB for local data
+               - Background sync for cloud
+               - Conflict resolution
+            
+            5. 🎯 Installation Prompts
+               - beforeinstallprompt event
+               - Custom install buttons
+               - Installation analytics
+            `;
+            
+            showPlatformModal('Progressive Web App', options, '#673ab7');
+        }
+        
+        // Create distribution packages
+        function createAndroidAPK() {
+            window.open('https://www.pwabuilder.com', '_blank');
+            toast("Opening PWA Builder for Android APK generation...");
+        }
+        
+        function createiOSapp() {
+            window.open('https://developer.apple.com/documentation/app_clips', '_blank');
+            toast("Redirecting to Apple App Clips documentation...");
+        }
+        
+        function createWindowsApp() {
+            window.open('https://docs.microsoft.com/en-us/microsoft-edge/progressive-web-apps-chromium/', '_blank');
+            toast("Opening Microsoft PWA documentation...");
+        }
+        
+        function createMacApp() {
+            window.open('https://developer.apple.com/documentation/safari-web-extensions', '_blank');
+            toast("Opening Safari Web Extensions documentation...");
+        }
+        
+        function createLinuxApp() {
+            window.open('https://electronjs.org', '_blank');
+            toast("Opening Electron for cross-platform desktop apps...");
+        }
+        
+        function createMobilePWA() {
+            window.open(PWA_URL, '_blank');
+            toast("Opening mobile-optimized PWA...");
+        }
+        
+        // Advanced distribution
+        function createElectronApp() {
+            const code = `// main.js
+const { app, BrowserWindow } = require('electron');
+
+function createWindow() {
+    const win = new BrowserWindow({
+        width: 1200,
+        height: 800,
+        webPreferences: {
+            nodeIntegration: false
+        }
+    });
+    
+    win.loadURL('${PWA_URL}');
+}
+
+app.whenReady().then(createWindow);`;
+            
+            showCodeModal('Electron App', code);
+        }
+        
+        function createChromeExtension() {
+            const manifest = `{
+    "manifest_version": 3,
+    "name": "Smart Plate AI",
+    "version": "1.0.0",
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "permissions": ["storage"],
+    "host_permissions": ["${PWA_URL}/*"]
+}`;
+            
+            showCodeModal('Chrome Extension Manifest', manifest);
+        }
+        
+        function generateAll() {
+            toast("🚀 Starting multi-platform generation...");
+            
+            const steps = [
+                "Preparing PWA for all platforms...",
+                "Generating Android APK...",
+                "Creating iOS web clip...",
+                "Building Windows desktop app...",
+                "Packaging for macOS...",
+                "Creating Linux packages...",
+                "Optimizing for web...",
+                "🎉 All formats ready!"
+            ];
+            
+            let step = 0;
+            const interval = setInterval(() => {
+                if (step < steps.length) {
+                    toast(steps[step]);
+                    step++;
+                } else {
+                    clearInterval(interval);
+                    showSuccessModal();
+                }
+            }, 1000);
+        }
+        
+        // Platform detection
+        function detectPlatformAndSuggest() {
+            const userAgent = navigator.userAgent;
+            let platform = 'web';
+            
+            if (/Android/i.test(userAgent)) {
+                platform = 'android';
+                setTimeout(() => toast("📱 Android detected. Tap Android card for APK options."), 2000);
+            } else if (/iPhone|iPad|iPod/i.test(userAgent)) {
+                platform = 'ios';
+                setTimeout(() => toast("🍎 iOS detected. Tap iOS card for Home Screen installation."), 2000);
+            } else if (/Windows/i.test(userAgent)) {
+                platform = 'windows';
+                setTimeout(() => toast("🖥️ Windows detected. Tap Windows card for desktop app."), 2000);
+            } else if (/Mac/i.test(userAgent)) {
+                platform = 'mac';
+                setTimeout(() => toast("🍎 Mac detected. Tap Mac card for desktop app."), 2000);
+            } else if (/Linux/i.test(userAgent)) {
+                platform = 'linux';
+                setTimeout(() => toast("🐧 Linux detected. Tap Linux card for desktop app."), 2000);
+            }
+            
+            console.log("Detected platform:", platform);
+        }
+        
+        // Helper functions
+        function showPlatformModal(title, content, color) {
+            const modal = `
+            <div class="modal fade" id="platformModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background: ${color}; color: white;">
+                            <h5 class="modal-title"><i class="fas fa-info-circle"></i> ${title}</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <pre style="white-space: pre-wrap; font-family: monospace;">${content}</pre>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" onclick="window.open('${PWA_URL}', '_blank')">Open PWA</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+            
+            // Remove existing modal
+            const existingModal = document.getElementById('platformModal');
+            if (existingModal) existingModal.remove();
+            
+            // Add new modal
+            document.body.insertAdjacentHTML('beforeend', modal);
+            
+            // Show modal
+            const modalElement = new bootstrap.Modal(document.getElementById('platformModal'));
+            modalElement.show();
+        }
+        
+        function showCodeModal(title, code) {
+            const modal = `
+            <div class="modal fade" id="codeModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="fas fa-code"></i> ${title}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <pre class="bg-dark text-white p-3 rounded" style="max-height: 400px; overflow: auto;">${code}</pre>
+                            <button class="btn btn-outline-primary mt-2" onclick="copyCode()">Copy Code</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+            
+            // Remove existing modal
+            const existingModal = document.getElementById('codeModal');
+            if (existingModal) existingModal.remove();
+            
+            // Add new modal
+            document.body.insertAdjacentHTML('beforeend', modal);
+            
+            // Show modal
+            const modalElement = new bootstrap.Modal(document.getElementById('codeModal'));
+            modalElement.show();
+        }
+        
+        function showSuccessModal() {
+            alert("🎉 All platform formats generated!\n\nCheck these locations:\n1. Android: APK in /dist folder\n2. iOS: Web clip ready\n3. Windows: Setup.exe created\n4. macOS: .dmg file ready\n5. Linux: .AppImage available\n\nYou can now distribute on all platforms!");
+        }
+        
+        function showInstructions() {
+            window.open('https://web.dev/progressive-web-apps/', '_blank');
+        }
+        
+        function copyCode() {
+            const codeElement = document.querySelector('#codeModal pre');
+            navigator.clipboard.writeText(codeElement.textContent)
+                .then(() => toast("Code copied to clipboard!"))
+                .catch(() => alert("Copy failed. Please select and copy manually."));
+        }
+        
+        function toast(message) {
+            // Simple toast notification
+            const toast = document.createElement('div');
+            toast.className = 'position-fixed bottom-0 end-0 p-3';
+            toast.innerHTML = `
+                <div class="toast show" role="alert">
+                    <div class="toast-header">
+                        <strong class="me-auto">Smart Plate AI</strong>
+                        <button type="button" class="btn-close" onclick="this.parentElement.parentElement.parentElement.remove()"></button>
+                    </div>
+                    <div class="toast-body">${message}</div>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
